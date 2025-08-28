@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const connectDB = async () => {
-    await mongoose.connect('');
-    // place your db string above which you might obtain from mongodb compass
+    await mongoose.connect('mongodb+srv://namastelearn:vHcmyKNDpRt2oUSz@namastelearn.1ffmcjv.mongodb.net/devTinder')
 };
 module.exports = connectDB;
