@@ -34,7 +34,12 @@ authRouter.post("/login", async (req, res) => {
         const verify_password = await user.validatePassword(password);
         if (verify_password) {
             const token = await user.getJWT();
-            res.cookie("token", token, {expires: new Date(Date.now()+8*3600000)});
+            res.cookie("token", token, {
+                httpOnly: true,
+                secure: true,   // Essential for cross-site cookies
+                sameSite: "none", // Allows the cookie to be sent from Vercel to Render
+                expires: new Date(Date.now() + 8 * 3600000) // 8 hours
+            });
             res.send(user);
         }
         else {
