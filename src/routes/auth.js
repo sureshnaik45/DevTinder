@@ -19,7 +19,8 @@ authRouter.post("/signup", async (req, res) => {
         res.cookie("token", token, {expires: new Date(Date.now()+8*3600000)});
         res.json({message:"User added successfully", data:new_user});
     } catch(err) {
-        res.status(400).send("ERROR : " + err.message);
+        console.log(err.message);
+        res.status(400).send("Some error while adding the user :)");
     }
 })
 
@@ -41,7 +42,8 @@ authRouter.post("/login", async (req, res) => {
         }
     }
     catch(err) {
-        res.status(400).send(err.message);
+        console.log(err.message);
+        res.status(400).send("Error related to login.");
     }
 })
 

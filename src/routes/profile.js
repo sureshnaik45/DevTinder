@@ -13,7 +13,8 @@ profileRouter.get("/profile/view", userAuth, async (req, res) => {
         res.send(user);
     }
     catch(err) {
-        res.status(400).send("ERROR : " + err.message);
+        console.log(err.message);
+        res.status(400).send("ERROR with profile :)" );
         // throw new Error("Something went wrong with profile")
     }
 })
@@ -33,7 +34,8 @@ profileRouter.post("/profile/edit", userAuth, async (req, res) => {
 
     res.json({ message: "Profile updated successfully", data: updatedUser });
   } catch (err) {
-    res.status(400).send(err.message || "Profile update failed");
+    console.log(err.message);
+    res.status(400).send("Profile update failed");
   }
 });
 
@@ -69,7 +71,8 @@ profileRouter.get("/feed", userAuth, async (req, res) => {
 
         res.json({message:"Connect with the folks : ", data:users});
     } catch(err) {
-        res.status(400).json({message:"ERROR : " + err.message});
+        console.log(err.message);
+        res.status(400).json({message:"ERROR : " });
     }
 })
 

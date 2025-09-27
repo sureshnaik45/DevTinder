@@ -18,7 +18,8 @@ requestsRouter.get("/requests/received", userAuth, async (req, res) => {
         res.json({message:"Data fetched successfully", data:connectionRequests});
 
     } catch(err) {
-        return res.status(400).json({message: "Error: " + err.message});
+        console.log( err.message);
+        return res.status(400).json({message: "Error related to data fetch :) "});
     }
 })
 
@@ -30,7 +31,7 @@ requestsRouter.get("/requests/sent", userAuth, async (req, res) => {
         }).populate("toUserId", User_Data)
         res.json({message:"Data fetched successfully", data:sentRequests});
     } catch(err) {
-        return res.status(400).json({message:""});
+        return res.status(400).json({message:"Error to fetch requests sent data :) "});
     }
 })
 
@@ -61,7 +62,8 @@ requestsRouter.delete("/request/cancel/:requestId", userAuth, async (req, res) =
 
     return res.status(403).json({ message: "Unauthorized or invalid request status" });
   } catch (err) {
-    res.status(500).json({ message: "Server error: " + err.message });
+    console.log(err.message);
+    res.status(500).json({ message: "Server error related to request :)"});
   }
 });
 

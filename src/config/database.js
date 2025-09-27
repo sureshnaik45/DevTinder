@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
+require('dotenv').config();
 const connectDB = async () => {
-    await mongoose.connect('')
-    // in the above use your db string which you can get from mongodb compass
+    await mongoose.connect(process.env.DB_CONNECTION_SECRET); // in .env create DB_CONNECTION_SECRET 
 };
 module.exports = connectDB;

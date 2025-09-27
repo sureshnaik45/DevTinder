@@ -11,6 +11,8 @@ connectionRouter.post("/connection/send/:status/:toUserId", userAuth, async (req
         const fromUserId = req.user._id;
         const toUserId = req.params.toUserId;
         const status = req.params.status;
+        const fromUserName = `${req.user.firstName} ${req.user.lastName || ''}`.trim();
+        const toUserName = `${toUser.firstName} ${toUser.lastName || ''}`.trim();
 
         const allowedStatus = ["ignored", "interested"];
         if (!allowedStatus.includes(status)) {
@@ -43,13 +45,13 @@ connectionRouter.post("/connection/send/:status/:toUserId", userAuth, async (req
 
         const data = await connectionRequest.save();
         res.json({
-            message:req.user.firstName + req.user.lastName + " " + status + " with " + toUser.firstName +
-                toUser.lastName,
+            message: `${fromUserName} is now ${status} in ${toUserName}`,
             data
         });
     }
     catch(err) {
-        res.status(400).send("ERROR : " + err.message);
+        console.log(err.message);
+        res.status(400).send("ERROR related to connection :)");
     }
 })
 
@@ -77,7 +79,8 @@ connectionRouter.post("/connection/review/:status/:requestId", userAuth, async (
         res.json({message:"Connection request " + status, data});
 
     } catch(err) {
-        res.status(400).send("ERROR : " + err.message);
+        console.log(err.message);
+        res.status(400).send("ERROR related to connection :)");
     }
 
 })
@@ -109,7 +112,8 @@ connectionRouter.get("/connections", userAuth, async (req, res) => {
     res.json({ message: "Data fetched successfully", data });
 
   } catch (err) {
-    res.status(400).json({ message: "Error " + err.message });
+    console.log(err.message);
+    res.status(400).json({ message: "Error while fetching the data from the user :)"});
   }
 });
 
