@@ -12,7 +12,6 @@ connectionRouter.post("/connection/send/:status/:toUserId", userAuth, async (req
         const toUserId = req.params.toUserId;
         const status = req.params.status;
         const fromUserName = `${req.user.firstName} ${req.user.lastName || ''}`.trim();
-        const toUserName = `${toUser.firstName} ${toUser.lastName || ''}`.trim();
 
         const allowedStatus = ["ignored", "interested"];
         if (!allowedStatus.includes(status)) {
@@ -25,6 +24,7 @@ connectionRouter.post("/connection/send/:status/:toUserId", userAuth, async (req
                 message:"The connection you're sending user is not found"
             });
         }
+        const toUserName = `${toUser.firstName} ${toUser.lastName || ''}`.trim();
 
         const existingConnectionRequest = await ConnectionRequest.findOne({
             $or:[
@@ -97,15 +97,14 @@ connectionRouter.get("/connections", userAuth, async (req, res) => {
       .populate("toUserId", User_Data);
 
     const data = connectionRequests.map((row) => {
-      // ✅ Define connectedUser before using it
       const connectedUser =
         row.fromUserId._id.toString() === req.user._id.toString()
           ? row.toUserId
           : row.fromUserId;
 
       return {
-        ...connectedUser._doc,     // Spread user data
-        requestId: row._id         // Include the connection request ID
+        ...connectedUser._doc,
+        requestId: row._id
       };
     });
 

@@ -1,10 +1,8 @@
-// you can write like this or else you can also write like the code present in user2.js
-// all this code is related to mondodb mongoose, all the code syntax followed from mongodb
+require('dotenv').config();
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-require('dotenv').config();
 const userSchema = new mongoose.Schema({
     firstName:{
         type:String,
@@ -61,17 +59,17 @@ const userSchema = new mongoose.Schema({
     about:{
         type:String,
         default:"This is your about section. You can add like I'm a blockchain developer",
+        maxLength: 90
         // lowercase:true, // whatever entered will be converted to lowercase and stored in database
         // trim:true, // this will trim the spaces from left and right side
         // minLength:4, // when the user enters about it need to be atleast 4 characters
         // maxLength:100, // about need to be less than 100 characters
-        
     },
     skills:{
-        type:[String], // this will take the skills as an array or in array format
+        type:[String],
         validate(value) {
-            if (value.length>20) {
-                throw new Error(value.length + "but need less than 20");
+            if (value.length > 25) {
+                throw new Error("You can have a maximum of 25 skills");
             }
         }
     }

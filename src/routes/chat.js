@@ -6,18 +6,14 @@ const { userAuth } = require('../middlewares/auth');
 
 const chatRouter = express.Router();
 
-// This route now supports pagination with ?page= and &limit=
 chatRouter.get('/chat/:targetUserId', userAuth, async (req, res) => {
     const { targetUserId } = req.params;
     const userId = req.user._id;
-
-    // Pagination query parameters
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10; // Load 10 messages per page
     const skip = (page - 1) * limit;
 
     try {
-        // SECURITY CHECK: Verify that the two users have an accepted connection
         const connection = await ConnectionRequest.findOne({
             $or: [
                 { fromUserId: userId, toUserId: targetUserId },
@@ -35,8 +31,6 @@ chatRouter.get('/chat/:targetUserId', userAuth, async (req, res) => {
         if (!targetUser) {
             return res.status(404).json({ message: "Chat partner not found." });
         }
-        
-        // Find the chat and get only a "slice" of the messages array
         const chat = await Chat.findOne(
             { participants: { $all: [userId, targetUserId] } },
             { messages: { $slice: [-limit * page, limit] } } // This is how we paginate the embedded array

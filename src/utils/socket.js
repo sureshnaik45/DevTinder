@@ -1,6 +1,7 @@
 const socket = require('socket.io');
 const crypto = require('crypto');
-const {Chat} = require('../models/chat');
+const { Chat } = require('../models/chat');
+const User = require('../models/user');
 
 const getSecretRoomId = (userId, targetUserId) => {
     return crypto
@@ -11,23 +12,22 @@ const getSecretRoomId = (userId, targetUserId) => {
 
 const initializeSocket = (server) => {
     const io = socket(server, {
-        cors : {
-            origin: process.env.ORIGIN
+        cors: {
+            origin: process.env.ORIGIN,
+            credentials: true
         }
     });
 
     io.on('connection', (socket) => {
-        socket.on('joinChat', ({firstName, userId, targetUserId}) => {
+        socket.on('joinChat', ({ userId, targetUserId }) => {
             const roomId = getSecretRoomId(userId, targetUserId);
-            console.log(firstName+'joined Room ' + roomId)
             socket.join(roomId);
         });
-        socket.on('sendMessage', async ({ firstName, userId, targetUserId, text}) => {            
+        socket.on('sendMessage', async ({ userId, targetUserId, text }) => {
             try {
                 const roomId = getSecretRoomId(userId, targetUserId);
-                console.log(firstName + " " + text);
                 let chat = await Chat.findOne({
-                    participants: {$all: [userId, targetUserId]}
+                    participants: { $all: [userId, targetUserId] }
                 });
                 if (!chat) {
                     chat = new Chat({
@@ -35,17 +35,25 @@ const initializeSocket = (server) => {
                         messages: [],
                     });
                 }
-                chat.messages.push({
-                    senderId:userId,
+                const newMessage = {
+                    senderId: userId,
                     text
-                })
+                };
+                chat.messages.push(newMessage);
                 await chat.save();
-                io.to(roomId).emit('messageReceived', {firstName, text});
-            } catch(err) {
+
+                const populatedMessage = await Chat.populate(chat, {
+                    path: 'messages.senderId',
+                    select: 'firstName lastName photoUrl'
+                });
+
+                const sentMessage = populatedMessage.messages[populatedMessage.messages.length - 1];
+                io.to(roomId).emit('messageReceived', sentMessage);
+            } catch (err) {
                 console.log(err);
             }
         });
-        socket.on('disconnect', () => {});
+        socket.on('disconnect', () => { });
     });
 };
 

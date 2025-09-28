@@ -35,7 +35,6 @@ requestsRouter.get("/requests/sent", userAuth, async (req, res) => {
     }
 })
 
-
 requestsRouter.delete("/request/cancel/:requestId", userAuth, async (req, res) => {
   try {
     const { requestId } = req.params;
@@ -47,23 +46,19 @@ requestsRouter.delete("/request/cancel/:requestId", userAuth, async (req, res) =
     const userId = req.user._id.toString();
     const isSender = request.fromUserId.toString() === userId;
     const isReceiver = request.toUserId.toString() === userId;
-
-    // Allow cancel if status is "interested" and user is sender
     if (request.status === "interested" && isSender) {
       await ConnectionRequest.findByIdAndDelete(requestId);
       return res.json({ message: "Request canceled successfully" });
     }
-
-    // Allow removal if status is "accepted" and user is sender or receiver
     if (request.status === "accepted" && (isSender || isReceiver)) {
       await ConnectionRequest.findByIdAndDelete(requestId);
       return res.json({ message: "Connection removed successfully" });
     }
-
     return res.status(403).json({ message: "Unauthorized or invalid request status" });
+
   } catch (err) {
     console.log(err.message);
-    res.status(500).json({ message: "Server error related to request :)"});
+    res.status(500).json({ message: "Server error while processing your request." });
   }
 });
 
