@@ -14,8 +14,8 @@ requestsRouter.get("/requests/received", userAuth, async (req, res) => {
         }).populate("fromUserId", User_Data); // the array contains what fields we need from the
         // document, if we don't pass anything it will fetch the whole document ["firstName", "lastName"] or
         // "firstName lastName" both are same, here we seperate the fields with space
-
-        res.json({message:"Data fetched successfully", data:connectionRequests});
+        const validRequests = connectionRequests.filter(request => request.fromUserId);
+        res.json({ message: "Data fetched successfully", data: validRequests });
 
     } catch(err) {
         console.log( err.message);
@@ -29,7 +29,8 @@ requestsRouter.get("/requests/sent", userAuth, async (req, res) => {
             fromUserId:req.user._id,
             status:"interested",
         }).populate("toUserId", User_Data)
-        res.json({message:"Data fetched successfully", data:sentRequests});
+        const validSentRequests = sentRequests.filter(request => request.toUserId);
+        res.json({ message: "Data fetched successfully", data: validSentRequests });
     } catch(err) {
         return res.status(400).json({message:"Error to fetch requests sent data :) "});
     }

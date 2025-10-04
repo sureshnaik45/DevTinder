@@ -96,7 +96,12 @@ connectionRouter.get("/connections", userAuth, async (req, res) => {
       .populate("fromUserId", User_Data)
       .populate("toUserId", User_Data);
 
-    const data = connectionRequests.map((row) => {
+    // Filter out connections where a user has been deleted
+    const validConnections = connectionRequests.filter(
+      (row) => row.fromUserId && row.toUserId
+    );
+
+    const data = validConnections.map((row) => {
       const connectedUser =
         row.fromUserId._id.toString() === req.user._id.toString()
           ? row.toUserId
@@ -115,6 +120,5 @@ connectionRouter.get("/connections", userAuth, async (req, res) => {
     res.status(400).json({ message: "Error while fetching the data from the user :)"});
   }
 });
-
 
 module.exports = connectionRouter;

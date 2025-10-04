@@ -13,11 +13,24 @@ const connectionRouter = require("./routes/connection");
 const requestsRouter = require("./routes/requests");
 const chatRouter = require('./routes/chat');
 
-app.use(cors({
-    origin: process.env.ORIGIN, // in .env create ORIGIN
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    credentials: true,
-}));
+const allowedOrigins = [process.env.ORIGIN];
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 app.use(express.json());
 app.use(cookieParser());

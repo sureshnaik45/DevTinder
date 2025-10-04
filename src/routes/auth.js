@@ -4,25 +4,30 @@ const { validateSignUp } = require("../utils/validation");
 const express = require("express");
 const authRouter = express.Router();
 
-
 authRouter.post("/signup", async (req, res) => {
     try {
         validateSignUp(req);
         const {firstName, lastName, emailId, password, age, gender, photoUrl, about, skills} = req.body;
-        const passwordHash = await bcrypt.hash(password, 10); // 10 is the number of times it will make it
-        // stronger
+
         const user = new User({
-            firstName, lastName, emailId, password:passwordHash, age, gender, photoUrl, about, skills
+            firstName, lastName, emailId, password, age, gender, photoUrl, about, skills
         });
+        
         const new_user = await user.save();
         const token = await new_user.getJWT();
-        res.cookie("token", token, {expires: new Date(Date.now()+8*3600000)});
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            expires: new Date(Date.now() + 8 * 3600000) // 8 hours
+        });
         res.json({message:"User added successfully", data:new_user});
     } catch(err) {
         console.log(err.message);
         res.status(400).send("Some error while adding the user :)");
     }
-})
+});
+
 
 authRouter.post("/login", async (req, res) => {
     try {
